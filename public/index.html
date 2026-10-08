@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>مستشفى بني مزار التخصصي</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src *;">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- شريط الملاحة العلوي -->
+  <header class="navbar">
+    <div class="nav-brand" onclick="goHome()">
+      <div class="brand-icon">🏥</div>
+      <div class="brand-title">
+        <h1>مستشفى بني مزار التخصصي</h1>
+        <small>العيادات الخارجية • شبكة بنك الدم • إشعارات واتساب</small>
+      </div>
+    </div>
+    <div id="navUser" class="nav-user hidden">
+      <div class="user-meta">
+        <span id="userNameDisplay" class="fw-bold"></span>
+        <span id="userBadge" class="badge"></span>
+      </div>
+      <button class="btn btn-outline-danger btn-sm" onclick="logout()">خروج</button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- 1. الهوم بيج التفاعلية -->
+    <section id="homeSection" class="hero-wrapper">
+      <div class="hero-banner">
+        <span class="badge-status">المنظومة الرقمية الموحدة</span>
+        <h2>مستشفى بني مزار التخصصي</h2>
+        <p class="hero-subtext">
+          صرح طبي متكامل لخدمة أهالي مركز بني مزار ومحافظة المنيا. نربط العيادات الخارجية التخصصية بمنظومة بنك الدم والطوارئ السريعة مع إشعارات واتساب فورية للمرضى والأطباء وسجل روشتات دائم.
+        </p>
+        <div class="hero-cta-group">
+          <button class="btn btn-primary btn-lg" onclick="showAuthView('login')">تسجيل الدخول للمنصة</button>
+          <button class="btn btn-outline-primary btn-lg" onclick="showAuthView('register')">فتح حساب مريض جديد</button>
+        </div>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-item">
+          <span class="f-icon">🩺</span>
+          <h4>4 عيادات تخصصية</h4>
+          <p>عظام، أطفال، باطنة، ورمد مع تنظيم مواعيد الكشوفات إلكترونياً.</p>
+        </div>
+        <div class="feature-item">
+          <span class="f-icon">🩸</span>
+          <h4>شبكة بنك الدم السريع</h4>
+          <p>مطابقة توافق الفصائل آلياً واستغاثات طوارئ فورية للمتبرعين.</p>
+        </div>
+        <div class="feature-item">
+          <span class="f-icon">💬</span>
+          <h4>تنبيهات واتساب مباشرة</h4>
+          <p>إرسال الروشتات الطبية ومواعيد الكشوفات مباشرة لهواتف المستفيدين.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. شاشة الدخول والتسجيل -->
+    <section id="authSection" class="auth-wrapper hidden">
+      <div class="card auth-card">
+        <div class="auth-tabs">
+          <button id="tabLogin" class="tab-btn active" onclick="switchAuthTab('login')">تسجيل الدخول</button>
+          <button id="tabRegister" class="tab-btn" onclick="switchAuthTab('register')">إنشاء حساب جديد</button>
+        </div>
+
+        <!-- تسجيل الدخول -->
+        <form id="loginForm" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label>رقم الهاتف (الواتساب):</label>
+            <input type="tel" id="loginPhone" placeholder="010xxxxxxxx" required>
+          </div>
+          <div class="form-group">
+            <label>كلمة المرور:</label>
+            <input type="password" id="loginPass" placeholder="******" required>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">دخول للمنصة</button>
+          
+          <div class="quick-demo">
+            <p>حسابات سريعة لتجربة المناقشة:</p>
+            <div class="demo-chips">
+              <span onclick="fillLogin('01018622861','Amr307&&')">د. عمرو عثمان (عظام)</span>
+              <span onclick="fillLogin('01009694831','123')">المريض: أحمد محمود (O-)</span>
+              <span onclick="fillLogin('01012006904','Malak136&&')">د. ملك محسن (أطفال)</span>
+              <span onclick="fillLogin('01107677972','Malak136@@')">د. ملك صلاح (باطنة)</span>
+            </div>
+          </div>
+        </form>
+
+        <!-- تسجيل حساب جديد -->
+        <form id="registerForm" class="hidden" onsubmit="handleRegister(event)">
+          <div class="form-group">
+            <label>الاسم بالكامل:</label>
+            <input type="text" id="regName" placeholder="الاسم ثلاثي" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>رقم هاتف الواتساب:</label>
+              <input type="tel" id="regPhone" placeholder="01xxxxxxxxx" required>
+            </div>
+            <div class="form-group">
+              <label>كلمة المرور:</label>
+              <input type="password" id="regPass" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>نوع الحساب:</label>
+            <select id="regRole" onchange="toggleRoleFields()">
+              <option value="PATIENT">مريض / متبرع بالدم</option>
+              <option value="DOCTOR">طبيب عيادة</option>
+            </select>
+          </div>
+
+          <div id="doctorFields" class="hidden">
+            <div class="form-group">
+              <label>العيادة التخصصية:</label>
+              <select id="regClinic">
+                <option value="عظام">عيادة جراحة العظام والكسور</option>
+                <option value="أطفال">عيادة طب الأطفال وحديثي الولادة</option>
+                <option value="باطنة">عيادة الباطنة العامة</option>
+                <option value="رمد">عيادة طب وجراحة العيون</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="donorFields">
+            <div class="form-row-3">
+              <div class="form-group">
+                <label>فصيلة الدم:</label>
+                <select id="regBloodType">
+                  <option value="O-">O- (معطي عام)</option>
+                  <option value="O+">O+</option>
+                  <option value="A+">A+</option>
+                  <option value="A-">A-</option>
+                  <option value="B+">B+</option>
+                  <option value="B-">B-</option>
+                  <option value="AB+">AB+</option>
+                  <option value="AB-">AB-</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>النوع:</label>
+                <select id="regGender">
+                  <option value="MALE">ذكر</option>
+                  <option value="FEMALE">أنثى</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>الوزن (كجم):</label>
+                <input type="number" id="regWeight" value="70">
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-success w-100 mt-2">إنشاء الحساب فوراً</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- 3. بوابة المريض والمتبرع -->
+    <section id="patientPortal" class="hidden">
+      <div id="emergencyBanner" class="hidden alert-sos">
+        <div class="sos-content">
+          <div class="sos-icon">🚨</div>
+          <div>
+            <h4 id="sosTitle">نداء استغاثة عاجل لمستشفى بني مزار!</h4>
+            <p id="sosDesc"></p>
+          </div>
+        </div>
+        <button class="btn btn-danger" onclick="respondToEmergency()">تأكيد الاستعداد للتبرع</button>
+      </div>
+
+      <div class="portal-nav">
+        <button class="nav-tab active" onclick="switchPortalTab('clinics')">حجز عيادة</button>
+        <button class="nav-tab" onclick="switchPortalTab('blood')">بنك الدم الذكي</button>
+        <button class="nav-tab" onclick="switchPortalTab('prescriptions')">سجل روشتاتي</button>
+      </div>
+
+      <!-- تبويب العيادات -->
+      <div id="tabContentClinics" class="tab-pane">
+        <div class="clinics-grid">
+          <div class="clinic-card" onclick="selectClinic('عظام')">
+            <span class="icon">🦴</span>
+            <h4>جراحة العظام</h4>
+            <p>د. عمرو عثمان</p>
+          </div>
+          <div class="clinic-card" onclick="selectClinic('أطفال')">
+            <span class="icon">👶</span>
+            <h4>طب الأطفال</h4>
+            <p>د. ملك محسن</p>
+          </div>
+          <div class="clinic-card" onclick="selectClinic('باطنة')">
+            <span class="icon">🩺</span>
+            <h4>الباطنة والجهاز الهضمي</h4>
+            <p>د. ملك صلاح</p>
+          </div>
+          <div class="clinic-card" onclick="selectClinic('رمد')">
+            <span class="icon">👁️</span>
+            <h4>الرمد والعيون</h4>
+            <p>قسم العيون التخصصي</p>
+          </div>
+        </div>
+
+        <div class="card mt-3">
+          <h3>حجز موعد كشف بعيادات المستشفى</h3>
+          <form onsubmit="handleBookAppointment(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label>العيادة:</label>
+                <select id="bookClinicSelect" onchange="filterDoctorsByClinic()" required>
+                  <option value="">-- اختر العيادة --</option>
+                  <option value="عظام">عيادة جراحة العظام</option>
+                  <option value="أطفال">عيادة الأطفال</option>
+                  <option value="باطنة">عيادة الباطنة</option>
+                  <option value="رمد">عيادة الرمد</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>الطبيب المتاح:</label>
+                <select id="bookDoctorSelect" required></select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>الموعد المحدد:</label>
+              <input type="datetime-local" id="bookDate" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">تأكيد الحجز وتنبيه الطبيب عبر واتساب</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- تبويب بنك الدم -->
+      <div id="tabContentBlood" class="tab-pane hidden">
+        <div class="form-row">
+          <div class="card">
+            <h3>ملف المتبرع الصحي</h3>
+            <div id="donorEligibilityBox" class="donor-status-box"></div>
+            <button class="btn btn-outline-primary w-100 mt-2" onclick="logSelfDonation()">تسجيل تبرع تم اليوم</button>
+          </div>
+
+          <div class="card border-sos">
+            <h3 class="text-danger">إطلاق استغاثة دم عاجلة (SOS)</h3>
+            <form onsubmit="handleTriggerSOS(event)">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>الفصيلة المطلوبة:</label>
+                  <select id="sosBloodType" required>
+                    <option value="O-">O- (معطي عام وحرج)</option>
+                    <option value="O+">O+</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="AB-">AB-</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>عدد الأكياس:</label>
+                  <input type="number" id="sosUnits" value="2" min="1" max="10" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>مكان الحالة:</label>
+                <input type="text" id="sosHospital" value="مستشفى بني مزار التخصصي - طوارئ الدور الأرضي" required>
+              </div>
+              <button type="submit" class="btn btn-danger w-100">إرسال استغاثة فورية وتنبيه المتبرعين عبر واتساب</button>
+            </form>
+          </div>
+        </div>
+
+        <div class="card mt-3">
+          <h3>سجل الاستغاثات النشطة</h3>
+          <div id="activeBloodRequestsList"></div>
+        </div>
+      </div>
+
+      <!-- تبويب الروشتات -->
+      <div id="tabContentPrescriptions" class="tab-pane hidden">
+        <div class="card">
+          <h3>سجل الروشتات الطبية الدائم</h3>
+          <div id="patientPrescriptionsList"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. بوابة الطبيب -->
+    <section id="doctorPortal" class="hidden">
+      <div class="card">
+        <div class="flex-between">
+          <div>
+            <h3 id="docClinicHeading">عيادة...</h3>
+            <p id="docDoctorName" class="text-muted"></p>
+          </div>
+          <span class="badge badge-success">استقبال الكشوفات نشط</span>
+        </div>
+        <hr>
+        <h4>كشوفات وحجوزات المرضى المسجلة</h4>
+        <div id="doctorAppointmentsList"></div>
+      </div>
+
+      <!-- كتابة الروشتة -->
+      <div id="prescriptionModal" class="card hidden border-primary mt-3">
+        <div class="flex-between">
+          <h4 id="prescTargetPatientTitle">كتابة روشتة</h4>
+          <button class="btn btn-sm btn-outline-danger" onclick="closePrescriptionModal()">إلغاء</button>
+        </div>
+        <form onsubmit="handleSavePrescription(event)">
+          <input type="hidden" id="currentAptId">
+          <input type="hidden" id="currentPatientPhone">
+          <input type="hidden" id="currentPatientName">
+          <div class="form-group">
+            <label>التشخيص الطبي للحالة:</label>
+            <input type="text" id="prescDiagnosis" placeholder="أدخل التشخيص..." required>
+          </div>
+          <div class="form-group">
+            <label>الأدوية والجرعات بالتفصيل:</label>
+            <textarea id="prescMeds" rows="5" placeholder="الدواء، الجرعة، التعليمات..." required></textarea>
+          </div>
+          <button type="submit" class="btn btn-success w-100">حفظ الروشتة بسجل المريض وإرسالها لواتساب</button>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
