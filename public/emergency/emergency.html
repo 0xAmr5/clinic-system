@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>قسم الطوارئ والاستقبال | مستشفى بني مزار</title>
+  <link rel="stylesheet" href="../style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <header class="navbar" style="border-bottom: 2px solid var(--danger);">
+    <div class="nav-brand" onclick="location.href='../index.html'">
+      <div class="brand-icon">🚨</div>
+      <div class="brand-title">
+        <h1 style="color:var(--danger);">قسم الطوارئ والاستقبال والحالات الحرجة</h1>
+        <small>مستشفى بني مزار التخصصي • طوارئ 24/7</small>
+      </div>
+    </div>
+    <div id="navUser" class="nav-user">
+      <span id="userNameDisplay" class="fw-bold"></span>
+      <span id="userBadge" class="badge badge-blood"></span>
+      <button class="btn btn-outline-danger btn-sm" onclick="logout()">خروج</button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- شاشة طبيب الطوارئ: لوحة الفرز الحيّة (Triage Board) -->
+    <div id="doctorEmergencyView" class="hidden">
+      <div class="card mb-3" style="background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%); border: 1px solid #fecdd3;">
+        <div class="flex-between">
+          <div>
+            <h3 style="color:#9f1239;">غرفة عمليات وفرز الحالات الحرجة</h3>
+            <p class="text-muted fs-small">إشراف: د. حازم القاضي • تصنيف الحالات طبقاً لبروتوكول الفرز الطبي العالمي (MTS)</p>
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="toggleNewEmergencyModal()">+ استقبال حالة طارئة جديدة</button>
+        </div>
+      </div>
+
+      <!-- إحصائيات سريعة للحالات المتواجدة -->
+      <div class="stats-grid mb-3">
+        <div class="stat-box" style="border-top: 4px solid #ef4444;">
+          <strong id="statRedCases" style="color:#ef4444;">0</strong>
+          <span>حالات إنعاش فوري (كود أحمر)</span>
+        </div>
+        <div class="stat-box" style="border-top: 4px solid #f59e0b;">
+          <strong id="statYellowCases" style="color:#f59e0b;">0</strong>
+          <span>حالات عاجلة (كود أصفر)</span>
+        </div>
+        <div class="stat-box" style="border-top: 4px solid #10b981;">
+          <strong id="statGreenCases" style="color:#10b981;">0</strong>
+          <span>حالات مستقرة (كود أخضر)</span>
+        </div>
+      </div>
+
+      <!-- قائمة الحالات المتواجدة تحت الملاحظة والإنعاش -->
+      <div class="card">
+        <h4>الحالات النشطة بقسم الطوارئ والاستقبال</h4>
+        <div id="emergencyCasesTable" class="table-responsive mt-2"></div>
+      </div>
+    </div>
+
+    <!-- مودال استقبال / تسجيل حالة طوارئ سريعة -->
+    <div id="newEmergencyModal" class="card border-primary hidden mt-3">
+      <div class="flex-between">
+        <h4 id="emModalTitle">تسجيل حالة طارئة بقسم الاستقبال</h4>
+        <button class="btn btn-sm btn-outline-danger" onclick="toggleNewEmergencyModal()">إلغاء</button>
+      </div>
+      <form onsubmit="handleSaveEmergencyCase(event)">
+        <div class="form-row mt-2">
+          <div class="form-group">
+            <label>اسم المريض / المصاب:</label>
+            <input type="text" id="emPatientName" placeholder="الاسم أو مجهول الهوية" required>
+          </div>
+          <div class="form-group">
+            <label>رقم الهاتف / المرافق:</label>
+            <input type="tel" id="emPatientPhone" placeholder="01xxxxxxxxx" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>مستوى الفرز والخطورة (Triage Code):</label>
+            <select id="emTriageLevel" required>
+              <option value="RED">🔴 كود أحمر (إنعاش وتدخل فوري - غير مستقر)</option>
+              <option value="YELLOW">🟡 كود أصفر (عاجل - كسور مضاعفة / ضيق تنفس)</option>
+              <option value="GREEN">🟢 كود أخضر (ألم معتدل / حالة مستقرة)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>التشخيص الأولي / سبب الدخول:</label>
+            <input type="text" id="emCondition" placeholder="مثال: حادث دراجة نارية / ألم بالصدر" required>
+          </div>
+        </div>
+
+        <div class="form-row-3">
+          <div class="form-group">
+            <label>ضغط الدم (BP):</label>
+            <input type="text" id="emVitalsBP" placeholder="120/80">
+          </div>
+          <div class="form-group">
+            <label>النبض (Pulse):</label>
+            <input type="number" id="emVitalsPulse" placeholder="85">
+          </div>
+          <div class="form-group">
+            <label>نسبة الأكسجين (%SpO2):</label>
+            <input type="number" id="emVitalsOxygen" placeholder="98">
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-danger w-100">إدخال الحالة للقسم وتعيين سرير الملاحظة فوراً</button>
+      </form>
+    </div>
+
+    <!-- شاشة المريض: طلب نداء طوارئ SOS فوري -->
+    <div id="patientEmergencyView" class="hidden">
+      <div class="card mb-3 border-sos text-center" style="padding: 2.5rem 1.5rem;">
+        <span style="font-size: 3.5rem;">🚨</span>
+        <h2 style="color:var(--danger); margin: 0.5rem 0;">طلب استغاثة طوارئ سريعة للمستشفى</h2>
+        <p class="text-muted" style="max-width: 600px; margin: 0 auto 1.5rem;">
+          في الحالات الحرجة وحوادث الطرق أو الأزمات القلبية المفاجئة، اضغط على زر الاستغاثة لإبلاغ فريق طوارئ مستشفى بني مزار التخصصي لتجهيز سرير الإنعاش والاستقبال.
+        </p>
+        <button class="btn btn-danger btn-lg" onclick="triggerPatientEmergencySOS()" style="font-size:1.2rem; padding: 1rem 2.5rem;">
+          🚨 إرسال نداء استغاثة عاجل (Emergency SOS)
+        </button>
+      </div>
+
+      <div class="card">
+        <h4>أرقام هواتف الطوارئ المباشرة بالمستشفى</h4>
+        <div class="records-list mt-2">
+          <div class="record-box flex-between">
+            <div>
+              <strong>استقبال طوارئ بني مزار:</strong> 0863820120<br>
+              <small class="text-muted">متاح 24 ساعة يومياً لجميع حالات الحوادث والحرجة</small>
+            </div>
+            <a href="tel:0863820120" class="btn btn-outline-danger btn-sm">اتصال فوري 📞</a>
+          </div>
+          <div class="record-box flex-between">
+            <div>
+              <strong>هيئة الإسعاف المصرية:</strong> 123<br>
+              <small class="text-muted">طلب سيارة إسعاف مجهزة للنقل الفوري</small>
+            </div>
+            <a href="tel:123" class="btn btn-outline-danger btn-sm">اتصال 123 🚑</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script type="module" src="emergency.js"></script>
+</body>
+</html>

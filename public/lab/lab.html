@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>معمل التحاليل الطبية | د. نورهان البدري</title>
+  <link rel="stylesheet" href="../style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="nav-brand" onclick="location.href='../index.html'">
+      <div class="brand-icon">🧪</div>
+      <div class="brand-title">
+        <h1>معمل الباثولوجيا والتحاليل الطبية</h1>
+        <small>إشراف: د. نورهان البدري • مستشفى بني مزار</small>
+      </div>
+    </div>
+    <div id="navUser" class="nav-user">
+      <span id="userNameDisplay" class="fw-bold"></span>
+      <button class="btn btn-outline-danger btn-sm" onclick="logout()">خروج</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="card mb-3">
+      <div class="flex-between">
+        <div>
+          <h3>لوحة نتائج وتحاليل المرضى</h3>
+          <p class="text-muted fs-small">تسجيل نتائج العينات وتقارير التحاليل المخبرية وإرفاق المستندات</p>
+        </div>
+        <span class="badge badge-success">د. نورهان البدري (متاحة)</span>
+      </div>
+      <div id="labRequestsTable" class="table-responsive mt-2"></div>
+    </div>
+
+    <!-- نافذة كتابة نتائج التحليل مع إرفاق صورة/ملف -->
+    <div id="labModal" class="card border-primary hidden mt-3">
+      <div class="flex-between">
+        <h4 id="labModalTitle">تسجيل نتيجة تحليل</h4>
+        <button class="btn btn-sm btn-outline-danger" onclick="closeLabModal()">إلغاء</button>
+      </div>
+      <form onsubmit="handleSaveLabReport(event)">
+        <input type="hidden" id="currentLabId">
+        <div class="form-group mt-2">
+          <label>نتائج العينة والتقرير الطبي المعتمد:</label>
+          <textarea id="labReportText" rows="4" placeholder="اكتب النتائج والنسب والملاحظات الإكلينيكية بالتفصيل..." required></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label>إرفاق صورة التحليل / المستند الممسوح ضوئياً (اختياري):</label>
+          <input type="file" id="labAttachmentFile" accept="image/*" onchange="previewLabFile(event)">
+          <div id="labFilePreviewBox" class="mt-2 hidden">
+            <img id="labImgPreview" src="" alt="معاينة المرفق" style="max-height: 160px; border-radius: 8px; border: 1px solid var(--border);">
+            <p id="labFileNamePreview" class="text-muted fs-small"></p>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-success w-100">اعتماد النتيجة وإرسالها لملف المريض فوراً ✓</button>
+      </form>
+    </div>
+  </main>
+
+  <script type="module" src="lab.js"></script>
+</body>
+</html>

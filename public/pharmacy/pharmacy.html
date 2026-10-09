@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>صيدلية المستشفى الإكلينيكية | مستشفى بني مزار</title>
+  <link rel="stylesheet" href="../style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="nav-brand" onclick="location.href='../index.html'">
+      <div class="brand-icon">💊</div>
+      <div class="brand-title">
+        <h1>صيدلية مستشفى بني مزار الإكلينيكية</h1>
+        <small>مخزون الأدوية • شبكة تتبع النواقص • د. مصطفى الجمال</small>
+      </div>
+    </div>
+    <div id="navUser" class="nav-user">
+      <span id="userNameDisplay" class="fw-bold"></span>
+      <span id="userBadge" class="badge badge-success"></span>
+      <button class="btn btn-outline-danger btn-sm" onclick="logout()">خروج</button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- شاشة الصيدلي: إدارة المخزون وتنبيه المرضى بالنواقص -->
+    <div id="pharmacistView" class="hidden">
+      <div class="card mb-3">
+        <div class="flex-between">
+          <div>
+            <h3>لوحة إدارة الصيدلية ونواقص الأدوية</h3>
+            <p class="text-muted fs-small">متابعة مخزون الأدوية الحيوية وتوفير النواقص للمرضى المسجلين</p>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="toggleAddDrugForm()">+ إضافة صنف دوائي للمخزون</button>
+        </div>
+
+        <!-- فورم إضافة دواء جديد للمخزون -->
+        <div id="addDrugBox" class="mt-3 hidden" style="background:#f8fafc; padding:15px; border-radius:8px; border:1px solid var(--border);">
+          <h4>إضافة صنف دوائي جديد</h4>
+          <form onsubmit="handleAddNewDrug(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label>اسم الدواء والتركيز:</label>
+                <input type="text" id="newDrugName" placeholder="مثال: Janumet 50/1000mg" required>
+              </div>
+              <div class="form-group">
+                <label>التصنيف العلاجي:</label>
+                <select id="newDrugCategory" required>
+                  <option value="سكر وغدد">أدوية السكر والغدد الصماء</option>
+                  <option value="ضغط وقلب">أدوية الضغط والقلب</option>
+                  <option value="مسكنات وعظام">مسكنات ومضادات التهاب</option>
+                  <option value="مضادات حيوية">مضادات حيوية وتنفسية</option>
+                  <option value="أخرى">أدوية عامة وفيتامينات</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>الكمية المتوفرة (عبوات):</label>
+                <input type="number" id="newDrugQty" value="20" min="0" required>
+              </div>
+              <div class="form-group">
+                <label>سعر العبوة (ج.م):</label>
+                <input type="number" id="newDrugPrice" value="120" min="1" required>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-success w-100">تثبيت الصنف في صيدلية المستشفى</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- طلبات المرضى للأدوية الناقصة -->
+      <div class="card mb-3 border-primary">
+        <div class="flex-between">
+          <h4>🚨 قائمة طلبات الأدوية الناقصة للمرضى (تنبيهات فورية)</h4>
+          <span class="badge badge-admin">تحديث حي</span>
+        </div>
+        <p class="text-muted fs-small">بمجرد وصول شحنة الدواء، اضغط على "توفير الدواء وتنبيه المريض" لإرسال إشعار فوري لملفه.</p>
+        <div id="shortageRequestsTable" class="table-responsive mt-2"></div>
+      </div>
+
+      <!-- قائمة المخزون الحالي بالصيدلية -->
+      <div class="card">
+        <h4>المخزون الدوائي المتاح حالياً بالصيدلية</h4>
+        <div id="pharmacyStockTable" class="table-responsive mt-2"></div>
+      </div>
+    </div>
+
+    <!-- شاشة المريض: تصفح الأدوية وطلب دواء ناقص -->
+    <div id="patientPharmacyView" class="hidden">
+      <!-- تنبيه وصول دواء كان ناقصاً -->
+      <div id="drugAlertBanner" class="hidden alert-sos" style="border-color: #10b981; background: #ecfdf5;">
+        <div class="sos-content">
+          <div class="sos-icon">🔔</div>
+          <div>
+            <h4 id="drugAlertTitle" style="color: #065f46;">تم توفير دوائك بصيدلية المستشفى!</h4>
+            <p id="drugAlertDesc" style="color: #047857;"></p>
+          </div>
+        </div>
+        <button class="btn btn-success btn-sm" onclick="markDrugReceived()">تأكيد الاستلام ✓</button>
+      </div>
+
+      <!-- فورم طلب دواء ناقص للمريض -->
+      <div class="card mb-3 border-sos">
+        <h3 class="text-danger">طلب توفير دواء ناقص (خدمة مرضى الأمراض المزمنة)</h3>
+        <p class="text-muted fs-small">إذا كنت تبحث عن دواء سكر أو ضغط أو علاج نادر ولم تجده، سجل اسمه هنا وسنقوم بتوفيره وإشعارك فور وصوله لصيدلية المستشفى.</p>
+        <form onsubmit="handleRequestShortageDrug(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label>اسم الدواء والتركيز المطلوب بدقة:</label>
+              <input type="text" id="reqDrugName" placeholder="مثال: Lantus Solostar أو Janumet" required>
+            </div>
+            <div class="form-group">
+              <label>التصنيف الطبي:</label>
+              <select id="reqDrugCategory" required>
+                <option value="أدوية سكر">أدوية سكر وأنسولين</option>
+                <option value="أدوية ضغط وقلب">أدوية ضغط وأوعية دموية</option>
+                <option value="أدوية أخرى">علاجات أخرى</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>ملاحظات إضافية (الجرعة / البدائل المقبولة):</label>
+            <input type="text" id="reqDrugNotes" placeholder="مثال: يرجى توفير قلم أنسولين أو شريطين">
+          </div>
+          <button type="submit" class="btn btn-danger w-100">تسجيل طلب توفير الدواء وإرساله للصيدلية</button>
+        </form>
+      </div>
+
+      <!-- سجل طلباتي السابقة للنواقص -->
+      <div class="card mb-3">
+        <h4>متابعة طلبات الأدوية الناقصة التي سجلتها</h4>
+        <div id="myShortageRequestsList" class="records-list mt-2"></div>
+      </div>
+
+      <!-- قائمة أدوية الصيدلية المتوفرة والأسعار -->
+      <div class="card">
+        <h4>الأدوية المتوفرة بصيدلية المستشفى والأسعار الرسمية</h4>
+        <div id="patientStockViewList" class="table-responsive mt-2"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <script type="module" src="pharmacy.js"></script>
+</body>
+</html>

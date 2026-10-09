@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>قسم الأشعة التشخيصية | د. كريم الشريف</title>
+  <link rel="stylesheet" href="../style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="nav-brand" onclick="location.href='../index.html'">
+      <div class="brand-icon">🩻</div>
+      <div class="brand-title">
+        <h1>قسم الأشعة التشخيصية والتداخلية</h1>
+        <small>إشراف: د. كريم الشريف • مستشفى بني مزار</small>
+      </div>
+    </div>
+    <div id="navUser" class="nav-user">
+      <span id="userNameDisplay" class="fw-bold"></span>
+      <button class="btn btn-outline-danger btn-sm" onclick="logout()">خروج</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="card mb-3">
+      <div class="flex-between">
+        <div>
+          <h3>لوحة تقارير الأشعة المعتمدة</h3>
+          <p class="text-muted fs-small">استعراض فحوصات المرضى وتسجيل التقارير الإشعاعية وإرفاق صور الأشعة</p>
+        </div>
+        <span class="badge badge-success">د. كريم الشريف (متاح)</span>
+      </div>
+      <div id="radRequestsTable" class="table-responsive mt-2"></div>
+    </div>
+
+    <!-- كتابة التقرير الإشعاعي مع صورة الأشعة -->
+    <div id="radModal" class="card border-primary hidden mt-3">
+      <div class="flex-between">
+        <h4 id="radModalTitle">كتابة تقرير أشعة</h4>
+        <button class="btn btn-sm btn-outline-danger" onclick="closeRadModal()">إلغاء</button>
+      </div>
+      <form onsubmit="handleSaveRadReport(event)">
+        <input type="hidden" id="currentRadId">
+        <div class="form-group mt-2">
+          <label>التقرير الإشعاعي المعتمد:</label>
+          <textarea id="radReportText" rows="5" placeholder="اكتب وصف الحالة والأشعة بالتفصيل..." required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>إرفاق فيلم / صورة الأشعة التشخيصية (X-Ray / MRI / Sonar):</label>
+          <input type="file" id="radAttachmentFile" accept="image/*" onchange="previewRadFile(event)">
+          <div id="radFilePreviewBox" class="mt-2 hidden">
+            <img id="radImgPreview" src="" alt="صورة الأشعة" style="max-height: 180px; border-radius: 8px; border: 1px solid var(--border);">
+            <p id="radFileNamePreview" class="text-muted fs-small"></p>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-success w-100">اعتماد التقرير وإرساله لملف المريض فوراً ✓</button>
+      </form>
+    </div>
+  </main>
+
+  <script type="module" src="radiology.js"></script>
+</body>
+</html>

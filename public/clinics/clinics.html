@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>العيادات الخارجية | مستشفى بني مزار التخصصي</title>
+  <link rel="stylesheet" href="../style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="nav-brand" onclick="location.href='../index.html'">
+      <div class="brand-icon">🩺</div>
+      <div class="brand-title">
+        <h1>مجمع العيادات الخارجية التخصصية</h1>
+        <small>مستشفى بني مزار التخصصي</small>
+      </div>
+    </div>
+    <div id="navUser" class="nav-user">
+      <span id="userNameDisplay" class="fw-bold"></span>
+      <span id="userBadge" class="badge"></span>
+      <button class="btn btn-outline-danger btn-sm" onclick="logout()">خروج</button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- شاشة الطبيب (د. عمرو عثمان / د. ملك محسن / د. ملك صلاح) -->
+    <div id="doctorPortalView" class="hidden">
+      <div class="card mb-3">
+        <div class="flex-between">
+          <div>
+            <h3 id="docClinicHeader">عيادة جراحة العظام</h3>
+            <p id="docDoctorSub" class="text-muted"></p>
+          </div>
+          <span class="badge badge-success">استقبال الكشوفات نشط</span>
+        </div>
+        <hr>
+        <h4>كشوفات وحجوزات اليوم بالعيادة:</h4>
+        <div id="doctorAppointmentsList" class="records-list mt-2"></div>
+      </div>
+
+      <!-- مودال كتابة الروشتة وعرض التاريخ المرضي -->
+      <div id="prescriptionModal" class="card border-primary hidden mt-3">
+        <div class="flex-between">
+          <h4 id="prescTargetPatientTitle">كشف طبي وإصدار روشتة</h4>
+          <button class="btn btn-sm btn-outline-danger" onclick="closePrescriptionModal()">إلغاء</button>
+        </div>
+
+        <div class="patient-history-box mt-2">
+          <h5>📋 السجل المرضي السابق للمريض بالمستشفى:</h5>
+          <div id="modalPatientHistory" class="history-scroll-box"></div>
+        </div>
+
+        <form onsubmit="handleSavePrescription(event)">
+          <input type="hidden" id="currentAptId">
+          <input type="hidden" id="currentPatientPhone">
+          <input type="hidden" id="currentPatientName">
+
+          <div class="form-group mt-2">
+            <label>التشخيص الطبي للحالة:</label>
+            <input type="text" id="prescDiagnosis" placeholder="مثال: التواء كاحل حاد مع تورم" required>
+          </div>
+          <div class="form-group">
+            <label>الأدوية والجرعات بالتفصيل:</label>
+            <textarea id="prescMeds" rows="5" placeholder="الدواء، الجرعة، التوقيت، ومدة العلاج..." required></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-success w-100">حفظ الروشتة بالسجل الطبي وإنهاء الكشف ✓</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- شاشة المريض: اختيار عيادة وحجز موعد -->
+    <div id="patientBookingView" class="hidden">
+      <div class="card mb-3">
+        <h3>أطباء العيادات المتاحين اليوم</h3>
+        <div class="clinics-grid mt-2">
+          <div class="clinic-card">
+            <span class="icon">🦴</span>
+            <h4>د. عمرو عثمان</h4>
+            <p>أخصائي جراحة العظام والمفاصل</p>
+            <small class="badge badge-success">كشف: 200 ج.م • يومياً 6-10 م</small>
+          </div>
+          <div class="clinic-card">
+            <span class="icon">👶</span>
+            <h4>د. ملك محسن</h4>
+            <p>أخصائية طب الأطفال وحديثي الولادة</p>
+            <small class="badge badge-success">كشف: 180 ج.م • السبت والإثنين والأربعاء</small>
+          </div>
+          <div class="clinic-card">
+            <span class="icon">🩺</span>
+            <h4>د. ملك صلاح</h4>
+            <p>أخصائية الأمراض الباطنية والسكر</p>
+            <small class="badge badge-success">كشف: 200 ج.م • الأحد والثلاثاء والخميس</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>حجز موعد كشف بعيادات المستشفى</h3>
+        <form onsubmit="handleBookAppointment(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label>اختر العيادة:</label>
+              <select id="bookClinicSelect" onchange="filterDoctorsByClinic()" required>
+                <option value="عظام">عيادة جراحة العظام (د. عمرو عثمان)</option>
+                <option value="أطفال">عيادة طب الأطفال (د. ملك محسن)</option>
+                <option value="باطنة">عيادة الباطنة العامة (د. ملك صلاح)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>الطبيب المعالج:</label>
+              <select id="bookDoctorSelect" required></select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>الموعد المطلوب:</label>
+            <input type="datetime-local" id="bookDate" required>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100">تأكيد حجز الكشف وتسجيله بالعيادة</button>
+        </form>
+      </div>
+    </div>
+
+  </main>
+
+  <script type="module" src="clinics.js"></script>
+</body>
+</html>

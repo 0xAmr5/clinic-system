@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بوابة المريض الموحدة | مستشفى بني مزار</title>
+  <link rel="stylesheet" href="../style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="nav-brand" onclick="location.href='../index.html'">
+      <div class="brand-icon">👤</div>
+      <div class="brand-title">
+        <h1>البوابة الطبية للمريض</h1>
+        <small>مستشفى بني مزار التخصصي</small>
+      </div>
+    </div>
+    <div id="navUser" class="nav-user">
+      <span id="userNameDisplay" class="fw-bold"></span>
+      <span id="userBadge" class="badge badge-blood"></span>
+      <button class="btn btn-outline-danger btn-sm" onclick="logout()">خروج</button>
+    </div>
+  </header>
+
+  <main class="container">
+    
+    <!-- شريط التبويبات الشامل للمريض -->
+    <div class="portal-nav mb-3">
+      <button class="nav-tab active" onclick="switchTab('clinic-book')">🩺 حجز عيادة</button>
+      <button class="nav-tab" onclick="switchTab('ai-triage')">🤖 الفرز والمساعد الذكي</button>
+      <button class="nav-tab" onclick="switchTab('lab-book')">🧪 حجز تحليل أو أشعة</button>
+      <button class="nav-tab" onclick="switchTab('my-records')">📋 روشتاتي وفحوصاتي</button>
+      <button class="nav-tab" onclick="switchTab('blood-bank')">🩸 بنك الدم والطوارئ</button>
+    </div>
+
+    <!-- 1. تبويب حجز كشف في العيادات الخارجية -->
+    <section id="tabClinicBook" class="tab-pane">
+      <div class="card mb-3">
+        <h3>الأطباء المتاحون بالعيادات الخارجية اليوم</h3>
+        <div class="clinics-grid mt-2">
+          <div class="clinic-card" onclick="selectClinic('عظام')">
+            <span class="icon">🦴</span>
+            <h4>د. عمرو عثمان</h4>
+            <p>أخصائي جراحة العظام والمفاصل</p>
+            <small class="badge badge-success">كشف: 200 ج.م • يومياً 6-10 م</small>
+          </div>
+          <div class="clinic-card" onclick="selectClinic('أطفال')">
+            <span class="icon">👶</span>
+            <h4>د. ملك محسن</h4>
+            <p>أخصائية طب الأطفال وحديثي الولادة</p>
+            <small class="badge badge-success">كشف: 180 ج.م • السبت والإثنين والأربعاء</small>
+          </div>
+          <div class="clinic-card" onclick="selectClinic('باطنة')">
+            <span class="icon">🩺</span>
+            <h4>د. ملك صلاح</h4>
+            <p>أخصائية الأمراض الباطنية والسكر</p>
+            <small class="badge badge-success">كشف: 200 ج.م • الأحد والثلاثاء والخميس</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>تثبيت ميعاد كشف في العيادة</h3>
+        <form onsubmit="handleBookClinic(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label>العيادة التخصصية:</label>
+              <select id="clinicSelect" onchange="filterDoctors()" required>
+                <option value="عظام">عيادة جراحة العظام (د. عمرو عثمان)</option>
+                <option value="أطفال">عيادة طب الأطفال (د. ملك محسن)</option>
+                <option value="باطنة">عيادة الباطنة العامة (د. ملك صلاح)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>الطبيب المعالج:</label>
+              <select id="doctorSelect" required></select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>موعد الكشف المطلوب:</label>
+              <input type="datetime-local" id="clinicDate" required>
+            </div>
+            <div class="form-group">
+              <label>قيمة الكشف المقررة:</label>
+              <input type="text" id="clinicFeeDisplay" readonly value="200 ج.م">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">تأكيد حجز الكشف الطبي</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- 2. تبويب المساعد الذكي وفرز الأعراض (AI Triage) -->
+    <section id="tabAiTriage" class="tab-pane hidden">
+      <div class="card mb-3 border-primary">
+        <div class="flex-between">
+          <div>
+            <h3>🤖 مساعد الفرز الطبي وتوجيه التخصصات</h3>
+            <p class="text-muted fs-small">اكتب ما تشعر به بدقة وسيقوم النظام الذكي بتحليل الأعراض وتوجيهك للتخصص والطبيب المناسب فوراً.</p>
+          </div>
+          <span class="badge badge-admin">AI Assistant</span>
+        </div>
+
+        <form onsubmit="handleAnalyzeSymptoms(event)" class="mt-2">
+          <div class="form-group">
+            <label>صف الأعراض أو الشكوى المرضية بالتفصيل:</label>
+            <textarea id="aiSymptomsInput" rows="3" placeholder="مثال: عندي ألم شديد في الركبة مع طقطقة وصعوبة في المشي، أو ألم حاد في المعدة وحموضة بعد الأكل..." required></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>مدة استمرار الأعراض:</label>
+              <select id="aiDuration">
+                <option value="ساعات قليلة">منذ ساعات قليلة (طارئ / حاد)</option>
+                <option value="يومين أو ثلاثة">منذ يومين إلى 3 أيام</option>
+                <option value="أكثر من أسبوع">أكثر من أسبوع (مزمن)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>حدة الألم من 1 إلى 10:</label>
+              <input type="number" id="aiPainLevel" min="1" max="10" value="5" required>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100">تحليل الأعراض بالذكاء الطبي ⚡</button>
+        </form>
+      </div>
+
+      <!-- نتيجة تحليل الذكاء الطبي والتوجيه المباشر -->
+      <div id="aiResultBox" class="card hidden">
+        <div class="flex-between">
+          <h4 id="aiResultTitle" style="color:var(--primary);">التقييم الطبي المقترح</h4>
+          <span id="aiSeverityBadge" class="badge"></span>
+        </div>
+        <p id="aiExplanation" class="mt-2" style="line-height:1.8;"></p>
+        
+        <div id="aiRecommendedAction" style="background:#f1f5f9; padding:15px; border-radius:8px; margin-top:12px; border-right:4px solid var(--primary);">
+          <!-- زر الحجز الفوري بناءً على التوصية -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. تبويب حجز تحليل أو أشعة -->
+    <section id="tabLabBook" class="tab-pane hidden">
+      <div class="card mb-3">
+        <h3>أقسام الفحوصات والتشخيص الطبي</h3>
+        <div class="clinics-grid mt-2">
+          <div class="clinic-card" onclick="selectLabDept('LAB')">
+            <span class="icon">🧪</span>
+            <h4>معمل التحاليل الطبية</h4>
+            <p>إشراف: د. نورهان البدري</p>
+            <small class="badge badge-success">صورة دم • كبد وكلى • سكر تراكمي</small>
+          </div>
+          <div class="clinic-card" onclick="selectLabDept('RAD')">
+            <span class="icon">🩻</span>
+            <h4>قسم الأشعة التشخيصية</h4>
+            <p>إشراف: د. كريم الشريف</p>
+            <small class="badge badge-success">أشعة سينية • سونار • مقطعية • رنين</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>طلب حجز فحص معملي أو أشعة</h3>
+        <form onsubmit="handleBookLab(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label>القسم المسؤول:</label>
+              <select id="labDeptSelect" onchange="loadTestOptions()" required>
+                <option value="LAB">معمل التحاليل الطبية (د. نورهان البدري)</option>
+                <option value="RAD">قسم الأشعة التشخيصية (د. كريم الشريف)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>الفحص المطلوب:</label>
+              <select id="testNameSelect" required></select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>الموعد المحدد للحضور:</label>
+              <input type="datetime-local" id="labDate" required>
+            </div>
+            <div class="form-group">
+              <label>رسوم الفحص المقررة:</label>
+              <input type="text" id="labPriceDisplay" readonly value="150 ج.م">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>ملاحظات الطبيب المعالج أو المريض:</label>
+            <input type="text" id="labNotes" placeholder="مثال: تحليل صائم 8 ساعات / وجود كسر بالكاحل">
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100">تأكيد حجز الفحص الطبي</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- 4. تبويب سجل الروشتات والفحوصات -->
+    <section id="tabMyRecords" class="tab-pane hidden">
+      <div class="card mb-3">
+        <h3>📋 سجل الروشتات الطبية الخاصة بي</h3>
+        <div id="patientPrescriptionsList" class="records-list mt-2"></div>
+      </div>
+
+      <div class="card">
+        <h3>🔬 تقارير ونتائج التحاليل والأشعة</h3>
+        <div id="patientLabResultsList" class="records-list mt-2"></div>
+      </div>
+    </section>
+
+    <!-- 5. تبويب بنك الدم -->
+    <section id="tabBloodBank" class="tab-pane hidden">
+      <div class="card mb-3">
+        <h3>ملف المتبرع الصحي الخاص بك</h3>
+        <div id="donorEligibilityBox" class="donor-status-box"></div>
+      </div>
+
+      <div class="card">
+        <h3>سجل نداءات واستغاثات الطوارئ الجارية</h3>
+        <div id="activeBloodList" class="records-list mt-2"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <script type="module" src="portal.js"></script>
+</body>
+</html>
